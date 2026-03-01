@@ -1,0 +1,9 @@
+.center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.stack-sans-notch {
+    font-family: 'Stack Sans Notch', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
