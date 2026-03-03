@@ -135,6 +135,23 @@
     font-size: 26px;
 }
 
+.install-toc ul {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.install-toc li {
+    margin: 8px 0;
+}
+
+.toc-link {
+    color: rgb(220, 220, 220);
+}
+
+.toc-link::after {
+    display: none;
+}
+
 .install-steps {
     margin: 0;
     padding-left: 20px;
