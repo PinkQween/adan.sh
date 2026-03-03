@@ -171,10 +171,8 @@
 
 .markdown-body blockquote {
     margin: 16px 0;
-    padding: 10px 14px;
-    border-left: #6f6f6f 3px solid;
-    background: #252525;
-    border-radius: 6px;
+    padding: 0 0 0 1em;
+    border-left: #6f6f6f 0.25em solid;
 }
 
 .markdown-body blockquote p {

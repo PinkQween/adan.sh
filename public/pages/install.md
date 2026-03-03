@@ -5,7 +5,7 @@
 
 ## Build the Compiler from Source
 
-> "It's highly recommended to use a mainstream Linux distribution such as Ubuntu, Fedora, or Arch Linux when compiling the ADAN compiler yourself."
+> It's highly recommended to use a mainstream Linux distribution such as Ubuntu, Fedora, or Arch Linux when compiling the ADAN compiler yourself.
 
 ### Clone the repository
 
@@ -28,6 +28,7 @@ chmod +x ./dependencies.sh
 ```bash
 make
 ```
+
 
 ## Useful Make Commands
 
