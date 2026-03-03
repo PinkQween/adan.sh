@@ -1,17 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
     const markdownRoot = document.getElementById("install-markdown");
-    const tocListRoot = document.getElementById("install-toc-list");
 
-    if (!markdownRoot || !tocListRoot) {
+    if (!markdownRoot) {
         return;
     }
-
-    const setTocMessage = (message) => {
-        tocListRoot.innerHTML = "";
-        const listItem = document.createElement("li");
-        listItem.textContent = message;
-        tocListRoot.appendChild(listItem);
-    };
 
     const slugify = (text) => text
         .toLowerCase()
@@ -19,26 +11,6 @@ document.addEventListener("DOMContentLoaded", () => {
         .replace(/[^a-z0-9\s-]/g, "")
         .replace(/\s+/g, "-")
         .replace(/-+/g, "-");
-
-    const buildToc = () => {
-        const tocHeadings = markdownRoot.querySelectorAll("h2, h3");
-        tocListRoot.innerHTML = "";
-
-        if (tocHeadings.length === 0) {
-            setTocMessage("No sections found.");
-            return;
-        }
-
-        tocHeadings.forEach((heading) => {
-            const listItem = document.createElement("li");
-            const link = document.createElement("a");
-            link.className = "toc-link";
-            link.href = `#${heading.id}`;
-            link.textContent = heading.textContent;
-            listItem.appendChild(link);
-            tocListRoot.appendChild(listItem);
-        });
-    };
 
     const renderMarkdown = (markdownText) => {
         if (!window.marked || !window.DOMPurify) {
@@ -61,16 +33,12 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
-        buildToc();
-
         if (window.Prism) {
             Prism.highlightAllUnder(markdownRoot);
         }
     };
 
     const loadInstallContent = () => {
-        setTocMessage("Loading sections...");
-
         fetch("./install.md")
             .then((response) => {
                 if (!response.ok) {
@@ -83,7 +51,6 @@ document.addEventListener("DOMContentLoaded", () => {
             })
             .catch(() => {
                 markdownRoot.innerHTML = "<p>Unable to load installation content right now.</p>";
-                setTocMessage("Unable to load sections.");
             });
     };
 
@@ -94,6 +61,5 @@ document.addEventListener("DOMContentLoaded", () => {
         })
         .catch(() => {
             markdownRoot.innerHTML = "<p>Unable to load required libraries right now.</p>";
-            setTocMessage("Unable to load sections.");
         });
 });
