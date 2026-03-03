@@ -97,6 +97,23 @@
     display: block;
 }
 
+@media (max-width: 720px) {
+    .install-navbar {
+        padding: 20px;
+        padding-left: 84px;
+        gap: 20px;
+    }
+
+    .install-navbar .logo-link {
+        left: 20px;
+    }
+
+    .install-navbar .logo-link img {
+        width: 44px;
+        height: 44px;
+    }
+}
+
 .code-sample {
     max-width: 1100px;
     margin: 40px auto 80px;
