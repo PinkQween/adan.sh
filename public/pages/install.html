@@ -12,10 +12,6 @@
     <link rel="stylesheet" href="../styles/classes.css">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
 
     <link rel="icon" href="../assets/logo.png">
 
@@ -35,11 +31,6 @@
     </div>
 
     <main class="install-doc">
-        <header class="install-doc-header">
-            <p class="install-doc-kicker">Official Resource</p>
-            <h1>ADAN Installation Guide</h1>
-        </header>
-
         <section class="install-toc-card">
             <h2>Table of Contents</h2>
             <ul id="install-toc-list"></ul>
@@ -49,65 +40,8 @@
             <div id="install-markdown" class="markdown-body"></div>
         </section>
     </main>
-
-    <script>
-        const markdownRoot = document.getElementById("install-markdown");
-        const tocListRoot = document.getElementById("install-toc-list");
-
-        const slugify = (text) => text
-            .toLowerCase()
-            .trim()
-            .replace(/[^a-z0-9\s-]/g, "")
-            .replace(/\s+/g, "-")
-            .replace(/-+/g, "-");
-
-        marked.setOptions({
-            gfm: true,
-            breaks: true
-        });
-
-        const renderMarkdown = (markdownText) => {
-            const unsafeHtml = marked.parse(markdownText.trim());
-            const safeHtml = DOMPurify.sanitize(unsafeHtml);
-            markdownRoot.innerHTML = safeHtml;
-
-            markdownRoot.querySelectorAll("h1, h2, h3, h4, h5, h6").forEach((heading) => {
-                if (!heading.id) {
-                    heading.id = slugify(heading.textContent);
-                }
-            });
-
-            const tocHeadings = markdownRoot.querySelectorAll("h2");
-            tocListRoot.innerHTML = "";
-            tocHeadings.forEach((heading) => {
-                const listItem = document.createElement("li");
-                const link = document.createElement("a");
-                link.className = "toc-link";
-                link.href = `#${heading.id}`;
-                link.textContent = heading.textContent;
-                listItem.appendChild(link);
-                tocListRoot.appendChild(listItem);
-            });
-
-            if (window.Prism) {
-                Prism.highlightAllUnder(markdownRoot);
-            }
-        };
-
-        fetch("./install.md")
-            .then((response) => {
-                if (!response.ok) {
-                    throw new Error("Failed to load install markdown content");
-                }
-                return response.text();
-            })
-            .then((markdownText) => {
-                renderMarkdown(markdownText);
-            })
-            .catch(() => {
-                markdownRoot.innerHTML = "<p>Unable to load installation content right now.</p>";
-            });
-    </script>
+    <script src="../scripts/vendor-loader.js"></script>
+    <script src="../scripts/install.js"></script>
 </body>
 
 </html>
