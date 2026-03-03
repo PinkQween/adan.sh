@@ -14,6 +14,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.1.6/purify.min.js"></script>
 
     <link rel="icon" href="../assets/logo.png">
 
@@ -37,46 +39,56 @@
             <h1>ADAN Installation Guide</h1>
         </header>
 
-        <section class="install-doc-section install-toc" id="table-of-contents">
-            <h2>Table of Contents</h2>
-            <ul>
-                <li><a class="toc-link" href="#build-from-source">Build the Compiler from Source</a></li>
-                <li><a class="toc-link" href="#make-commands">Useful Make Commands</a></li>
-            </ul>
-        </section>
-
-        <section class="install-doc-section" id="build-from-source">
-            <h2>Build the Compiler from Source</h2>
-            <p>It's highly recommended to use a mainstream Linux distribution such as Ubuntu, Fedora, or Arch Linux when compiling the ADAN compiler yourself.</p>
-            <ol class="install-steps">
-                <li>
-                    <h3>Clone the repository</h3>
-                    <pre><code class="language-bash">git clone https://github.com/Cappucina/ADAN.git
-cd ADAN</code></pre>
-                </li>
-                <li>
-                    <h3>Install dependencies</h3>
-                    <p>Run the dependency script before compiling manually.</p>
-                    <pre><code class="language-bash">chmod +x ./dependencies.sh
-./dependencies.sh</code></pre>
-                </li>
-                <li>
-                    <h3>Compile with Make</h3>
-                    <pre><code class="language-bash">make</code></pre>
-                </li>
-            </ol>
-        </section>
-
-        <section class="install-doc-section" id="make-commands">
-            <h2>Useful Make Commands</h2>
-            <pre><code class="language-bash">make         # Clean, build, and run the binary
-make build   # Clean and create a fresh binary
-make run     # Clear terminal and run an existing binary
-make format  # Format C files in ./src using .clang-format
-make clean   # Remove existing binary in ./build
-make install # Install required dependencies (Linux only)</code></pre>
+        <section class="install-doc-section">
+            <div id="install-markdown" class="markdown-body"></div>
         </section>
     </main>
+
+    <script>
+        const markdownRoot = document.getElementById("install-markdown");
+
+        const slugify = (text) => text
+            .toLowerCase()
+            .trim()
+            .replace(/[^a-z0-9\s-]/g, "")
+            .replace(/\s+/g, "-")
+            .replace(/-+/g, "-");
+
+        marked.setOptions({
+            gfm: true,
+            breaks: true
+        });
+
+        const renderMarkdown = (markdownText) => {
+            const unsafeHtml = marked.parse(markdownText.trim());
+            const safeHtml = DOMPurify.sanitize(unsafeHtml);
+            markdownRoot.innerHTML = safeHtml;
+
+            markdownRoot.querySelectorAll("h1, h2, h3, h4, h5, h6").forEach((heading) => {
+                if (!heading.id) {
+                    heading.id = slugify(heading.textContent);
+                }
+            });
+
+            if (window.Prism) {
+                Prism.highlightAllUnder(markdownRoot);
+            }
+        };
+
+        fetch("./install.md")
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error("Failed to load install markdown content");
+                }
+                return response.text();
+            })
+            .then((markdownText) => {
+                renderMarkdown(markdownText);
+            })
+            .catch(() => {
+                markdownRoot.innerHTML = "<p>Unable to load installation content right now.</p>";
+            });
+    </script>
 </body>
 
 </html>
