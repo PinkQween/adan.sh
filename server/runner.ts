@@ -1,5 +1,5 @@
 import { downloadAdanBinary } from "./adan";
-import { existsSync, writeFileSync, chmodSync, unlinkSync, mkdirSync, cpSync } from "fs";
+import { existsSync, writeFileSync, chmodSync, unlinkSync, mkdirSync } from "fs";
 import { tmpdir } from "os";
 import { join } from "path";
 import { spawn } from "child_process";
@@ -7,14 +7,14 @@ import { spawn } from "child_process";
 const BINARY_CACHE_PATH = join(tmpdir(), "adan-nightly");
 const SOURCE_FILE_PREFIX = join(tmpdir(), "adan-src-");
 const RUN_TIMEOUT_MS = 10_000;
-const MAX_OUTPUT_BYTES = 64 * 1024; // 64 KB output cap
+const MAX_OUTPUT_BYTES = 64 * 1024;
 
 const BUNDLED_ZIG = join(process.cwd(), "bin", "zig-dist", "zig");
 const BUNDLED_ZIG_LIB = join(process.cwd(), "bin", "zig-dist", "lib");
-const BUNDLED_ZIG_PREWARM = join(process.cwd(), "bin", "zig-dist", "zig-prewarm");
 const CLANG_WRAP_DIR = join(tmpdir(), "adan-clang-wrap");
 const CLANG_WRAP_PATH = join(CLANG_WRAP_DIR, "clang");
 const ZIG_GLOBAL_CACHE = join(tmpdir(), "zig-global-cache");
+const ZIG_LOCAL_CACHE = join(tmpdir(), "zig-local-cache");
 
 let binaryReady: Promise<string> | null = null;
 let clangReady: Promise<string> | null = null;
@@ -48,22 +48,31 @@ export function warmClang(): Promise<string> {
             }
             console.log("[runner] Using bundled zig at", BUNDLED_ZIG);
 
-            // Seed the zig global cache with pre-warmed CRT + compiler_rt objects
-            // that were compiled at build time. This lets zig cc link without
-            // needing glibc/compiler_rt source trees bundled.
-            if (existsSync(BUNDLED_ZIG_PREWARM) && !existsSync(ZIG_GLOBAL_CACHE)) {
-                console.log("[runner] Seeding zig global cache from pre-warm...");
-                mkdirSync(ZIG_GLOBAL_CACHE, { recursive: true });
-                cpSync(BUNDLED_ZIG_PREWARM, ZIG_GLOBAL_CACHE, { recursive: true });
-                console.log("[runner] zig global cache seeded");
-            }
-
             mkdirSync(CLANG_WRAP_DIR, { recursive: true });
+            mkdirSync(ZIG_GLOBAL_CACHE, { recursive: true });
+            mkdirSync(ZIG_LOCAL_CACHE, { recursive: true });
             writeFileSync(
                 CLANG_WRAP_PATH,
-                `#!/bin/sh\nexec env ZIG_LIB_DIR="${BUNDLED_ZIG_LIB}" ZIG_GLOBAL_CACHE_DIR="${ZIG_GLOBAL_CACHE}" ZIG_LOCAL_CACHE_DIR="/tmp/zig-local-cache" "${BUNDLED_ZIG}" cc -target x86_64-linux-gnu -march=x86_64 "$@"\n`,
+                `#!/bin/sh\nexec env ZIG_LIB_DIR="${BUNDLED_ZIG_LIB}" ZIG_GLOBAL_CACHE_DIR="${ZIG_GLOBAL_CACHE}" ZIG_LOCAL_CACHE_DIR="${ZIG_LOCAL_CACHE}" "${BUNDLED_ZIG}" cc -target x86_64-linux-musl -march=x86_64 "$@"\n`,
                 { mode: 0o755 },
             );
+
+            if (!existsSync(join(ZIG_GLOBAL_CACHE, ".warmed"))) {
+                console.log("[runner] Warming zig musl cache (first cold start)...");
+                await new Promise<void>((resolve, reject) => {
+                    const warmSrc = join(tmpdir(), "_adan_musl_warm.c");
+                    writeFileSync(warmSrc, "int main(void){return 0;}\n");
+                    const proc = spawn(CLANG_WRAP_PATH, [warmSrc, "-o", join(tmpdir(), "_adan_musl_warm")]);
+                    proc.on("close", (code) => {
+                        unlinkSync(warmSrc);
+                        try { unlinkSync(join(tmpdir(), "_adan_musl_warm")); } catch {}
+                        if (code === 0) { writeFileSync(join(ZIG_GLOBAL_CACHE, ".warmed"), ""); resolve(); }
+                        else reject(new Error(`zig musl warm failed with code ${code}`));
+                    });
+                    proc.on("error", reject);
+                });
+                console.log("[runner] zig musl cache warmed");
+            }
 
             return CLANG_WRAP_DIR;
         })().catch((err) => { clangReady = null; throw err; });
