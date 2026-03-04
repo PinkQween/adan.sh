@@ -3,16 +3,20 @@
     "outputDirectory": "public",
     "functions": {
         "api/run.ts": {
-            "maxDuration": 60
+            "maxDuration": 60,
+            "includeFiles": "bin/zig"
         },
         "api/warm.ts": {
-            "maxDuration": 60
+            "maxDuration": 60,
+            "includeFiles": "bin/zig"
         }
     },
     "routes": [
         {
             "src": "/api/(.*)",
-            "methods": ["OPTIONS"],
+            "methods": [
+                "OPTIONS"
+            ],
             "headers": {
                 "Access-Control-Allow-Origin": "https://playground.adan.sh",
                 "Access-Control-Allow-Methods": "POST, OPTIONS",

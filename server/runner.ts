@@ -1,5 +1,5 @@
 import { downloadAdanBinary } from "./adan";
-import { existsSync, writeFileSync, chmodSync, unlinkSync, mkdirSync, renameSync } from "fs";
+import { existsSync, writeFileSync, chmodSync, unlinkSync, mkdirSync } from "fs";
 import { tmpdir } from "os";
 import { join } from "path";
 import { spawn } from "child_process";
@@ -7,13 +7,12 @@ import { spawn } from "child_process";
 const BINARY_CACHE_PATH = join(tmpdir(), "adan-nightly");
 const SOURCE_FILE_PREFIX = join(tmpdir(), "adan-src-");
 const RUN_TIMEOUT_MS = 10_000;
-const WARM_TIMEOUT_MS = 60_000; // 60s for cold-start downloads
 const MAX_OUTPUT_BYTES = 64 * 1024; // 64 KB output cap
 
-const ZIG_VERSION = "0.13.0";
-const ZIG_ARCH_NAME = `zig-linux-x86_64-${ZIG_VERSION}`;
-const ZIG_URL = `https://ziglang.org/download/${ZIG_VERSION}/${ZIG_ARCH_NAME}.tar.xz`;
-const ZIG_CACHE_PATH = join(tmpdir(), "adan-zig-bin");
+// Zig is bundled at build time (scripts/prepare-zig.sh) and included via
+// vercel.json `includeFiles`. In Lambda, process.cwd() is /var/task.
+// Locally, check cwd()/bin/zig as well (after a manual `bash scripts/prepare-zig.sh`).
+const BUNDLED_ZIG = join(process.cwd(), "bin", "zig");
 const CLANG_WRAP_DIR = join(tmpdir(), "adan-clang-wrap");
 const CLANG_WRAP_PATH = join(CLANG_WRAP_DIR, "clang");
 
@@ -41,57 +40,19 @@ export function warmBinary(): Promise<string> {
 export function warmClang(): Promise<string> {
     if (!clangReady) {
         clangReady = (async () => {
-            if (!existsSync(ZIG_CACHE_PATH)) {
-                console.log("[runner] Downloading zig (bundled clang)...");
-
-                const res = await fetch(ZIG_URL);
-                if (!res.ok) throw new Error(`zig download failed: ${res.status} ${res.statusText}`);
-
-                const tarPath = join(tmpdir(), "adan-zig.tar.xz");
-                writeFileSync(tarPath, Buffer.from(await res.arrayBuffer()));
-                console.log("[runner] zig archive written, extracting...");
-
-                // Vercel Lambda has no `tar` in PATH. Use Python 3's built-in
-                // tarfile module instead — it has native xz (lzma) support and
-                // is always present in the Amazon Linux Lambda environment.
-                const pythonBin = ["/usr/bin/python3", "/usr/local/bin/python3", "python3"]
-                    .find(p => p === "python3" || existsSync(p)) ?? "python3";
-
-                const extractScript = [
-                    "import tarfile, os, sys",
-                    `t = tarfile.open(${JSON.stringify(tarPath)})`,
-                    `m = t.getmember(${JSON.stringify(ZIG_ARCH_NAME + "/zig")})`,
-                    `m.name = "zig"`,
-                    `t.extract(m, ${JSON.stringify(tmpdir())}, set_attrs=False)`,
-                    `t.close()`,
-                    `print("extracted", flush=True)`,
-                ].join("\n");
-
-                await new Promise<void>((resolve, reject) => {
-                    const proc = spawn(pythonBin, ["-c", extractScript]);
-                    const errChunks: Uint8Array[] = [];
-                    proc.stderr?.on("data", (c: Uint8Array) => errChunks.push(c));
-                    proc.on("close", (code) => {
-                        if (code === 0) return resolve();
-                        reject(new Error(`python3 extract failed (${code}): ${Buffer.concat(errChunks).toString()}`));
-                    });
-                    proc.on("error", (err) => reject(new Error(`spawn python3 failed: ${err.message}`)));
-                });
-
-                try { unlinkSync(tarPath); } catch { }
-
-                const extracted = join(tmpdir(), "zig");
-                renameSync(extracted, ZIG_CACHE_PATH);
-                chmodSync(ZIG_CACHE_PATH, 0o755);
-                console.log("[runner] zig cached at", ZIG_CACHE_PATH);
-            } else {
-                console.log("[runner] Using cached zig binary");
+            if (!existsSync(BUNDLED_ZIG)) {
+                throw new Error(
+                    `zig binary not found at ${BUNDLED_ZIG}. ` +
+                    "Run 'bash scripts/prepare-zig.sh' locally, or ensure it was built by Vercel."
+                );
             }
+            console.log("[runner] Using bundled zig at", BUNDLED_ZIG);
 
+            // Write a tiny `clang` shim that delegates to `zig cc`.
             mkdirSync(CLANG_WRAP_DIR, { recursive: true });
             writeFileSync(
                 CLANG_WRAP_PATH,
-                `#!/bin/sh\nexec "${ZIG_CACHE_PATH}" cc "$@"\n`,
+                `#!/bin/sh\nexec "${BUNDLED_ZIG}" cc "$@"\n`,
                 { mode: 0o755 },
             );
 
@@ -169,7 +130,7 @@ export async function runAdanCode(source: string): Promise<RunResult> {
         const compile = await spawnCollect(
             compilerPath,
             ["--file", sourceFile, "--link", "--bundle-libs", "libs/io", "-o", outputBinary],
-            WARM_TIMEOUT_MS,
+            RUN_TIMEOUT_MS,
             env,
         );
 
