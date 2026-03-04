@@ -10,7 +10,7 @@
                     "value": "docs.adan.sh"
                 }
             ],
-            "dest": "/pages/docs.html"
+            "dest": "/pages/docs/index.html"
         },
         {
             "src": "/",
@@ -20,7 +20,17 @@
                     "value": "install.adan.sh"
                 }
             ],
-            "dest": "/pages/install.html"
+            "dest": "/pages/install/index.html"
+        },
+        {
+            "src": "/",
+            "has": [
+                {
+                    "type": "host",
+                    "value": "playground.adan.sh"
+                }
+            ],
+            "dest": "/pages/playground/index.html"
         },
         {
             "handle": "filesystem"
