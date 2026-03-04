@@ -45,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
     };
 
     const loadInstallContent = () => {
-        return fetch("./install.md")
+        return fetch("/pages/install.md")
             .then((response) => {
                 if (!response.ok) {
                     throw new Error("Failed to load install markdown content");
