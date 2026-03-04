@@ -10,9 +10,10 @@ const RUN_TIMEOUT_MS = 10_000;
 const MAX_OUTPUT_BYTES = 64 * 1024; // 64 KB output cap
 
 // Zig is bundled at build time (scripts/prepare-zig.sh) and included via
-// vercel.json `includeFiles`. In Lambda, process.cwd() is /var/task.
-// Locally, check cwd()/bin/zig as well (after a manual `bash scripts/prepare-zig.sh`).
-const BUNDLED_ZIG = join(process.cwd(), "bin", "zig");
+// vercel.json `includeFiles`. Zig needs its lib/ directory alongside the
+// binary — we extract the full distribution to bin/zig-dist/.
+// In Lambda, process.cwd() is /var/task.
+const BUNDLED_ZIG = join(process.cwd(), "bin", "zig-dist", "zig");
 const CLANG_WRAP_DIR = join(tmpdir(), "adan-clang-wrap");
 const CLANG_WRAP_PATH = join(CLANG_WRAP_DIR, "clang");
 
