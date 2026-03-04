@@ -5,7 +5,6 @@ body {
     color: white;
 }
 
-/* Sub-pages (install, docs) — clean near-black, no wine gradient */
 body.geist {
     background: linear-gradient(180deg, #111111 0%, #090909 100%);
     background-attachment: fixed;

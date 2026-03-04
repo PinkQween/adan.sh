@@ -11,7 +11,7 @@
     justify-content: center;
     gap: 40px;
     max-width: 1100px;
-    margin: 80px auto;
+    margin: 40px auto;
     padding: 0 20px;
 }
 
@@ -123,7 +123,7 @@
 
 .install-doc {
     max-width: 900px;
-    margin: 72px auto 80px;
+    margin: 36px auto 80px;
     padding: 0 20px;
 }
 
@@ -371,41 +371,33 @@ pre[class*="language-"] code {
     opacity: 0.25;
 }
 
-/* ── ADAN syntax highlight palette ─────────────────────────────────── */
-/* Keywords: import, set, fun, return, etc.  →  Neon Pink */
 code[class*="language-adan"] .token.keyword {
     color: #ff2d78 !important;
     font-style: normal;
 }
 
-/* Built-in types: i32, string, f64, bool …  →  Electric Cyan */
 code[class*="language-adan"] .token.type {
     color: #00e5ff !important;
 }
 
-/* String literals & template literals  →  Safety Orange */
 code[class*="language-adan"] .token.string {
     color: #ff7c00 !important;
 }
 
-/* Numbers  →  softer gold to complement the palette */
 code[class*="language-adan"] .token.number {
     color: #ffd166 !important;
 }
 
-/* Comments stay muted */
 code[class*="language-adan"] .token.comment {
     color: #666e7a !important;
     font-style: italic;
 }
 
-/* Operators & punctuation */
 code[class*="language-adan"] .token.operator,
 code[class*="language-adan"] .token.punctuation {
     color: #aaaaaa !important;
 }
 
-/* Booleans share the type cyan */
 code[class*="language-adan"] .token.boolean {
     color: #00e5ff !important;
 }
