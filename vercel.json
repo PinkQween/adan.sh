@@ -10,7 +10,7 @@
                     "value": "docs.adan.sh"
                 }
             ],
-            "destination": "pages/docs.html"
+            "destination": "/pages/docs.html"
         },
         {
             "source": "/",
@@ -20,17 +20,7 @@
                     "value": "install.adan.sh"
                 }
             ],
-            "destination": "pages/install.html"
-        },
-        {
-            "source": "/",
-            "has": [
-                {
-                    "type": "host",
-                    "value": "adan.sh"
-                }
-            ],
-            "destination": "index.html"
+            "destination": "/pages/install.html"
         }
     ]
 }
