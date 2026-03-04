@@ -51,8 +51,11 @@ export function warmClang(): Promise<string> {
                 writeFileSync(tarPath, Buffer.from(await res.arrayBuffer()));
                 console.log("[runner] zig archive written, extracting...");
 
+                // Vercel Lambda's PATH is minimal — resolve tar by full path.
+                const tarBin = ["/usr/bin/tar", "/bin/tar"].find(existsSync) ?? "tar";
+
                 await new Promise<void>((resolve, reject) => {
-                    const proc = spawn("tar", [
+                    const proc = spawn(tarBin, [
                         "xJf", tarPath,
                         "-C", tmpdir(),
                         "--strip-components=1",
