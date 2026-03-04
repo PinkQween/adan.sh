@@ -6,17 +6,27 @@
             "maxDuration": 30
         }
     },
-    "headers": [
-        {
-            "source": "/api/(.*)",
-            "headers": [
-                { "key": "Access-Control-Allow-Origin", "value": "https://playground.adan.sh" },
-                { "key": "Access-Control-Allow-Methods", "value": "POST, OPTIONS" },
-                { "key": "Access-Control-Allow-Headers", "value": "Content-Type" }
-            ]
-        }
-    ],
     "routes": [
+        {
+            "src": "/api/(.*)",
+            "methods": ["OPTIONS"],
+            "headers": {
+                "Access-Control-Allow-Origin": "https://playground.adan.sh",
+                "Access-Control-Allow-Methods": "POST, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type"
+            },
+            "status": 204,
+            "dest": "/api/$1"
+        },
+        {
+            "src": "/api/(.*)",
+            "headers": {
+                "Access-Control-Allow-Origin": "https://playground.adan.sh",
+                "Access-Control-Allow-Methods": "POST, OPTIONS",
+                "Access-Control-Allow-Headers": "Content-Type"
+            },
+            "dest": "/api/$1"
+        },
         {
             "src": "/",
             "has": [

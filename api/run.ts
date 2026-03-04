@@ -12,32 +12,33 @@ const setCors = (res: VercelResponse) => {
 };
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
+    // Always set CORS headers first — even if we throw below
     setCors(res);
 
-    if (req.method === "OPTIONS") {
-        return res.status(204).end();
-    }
-
-    if (req.method !== "POST") {
-        return res.status(405).json({ error: "Method not allowed." });
-    }
-
-    const body = req.body as { code?: unknown } | undefined;
-    const code = body?.code;
-
-    if (typeof code !== "string") {
-        return res.status(400).json({ error: "Missing or invalid `code` field (expected string)." });
-    }
-
-    if (Buffer.byteLength(code, "utf8") > MAX_SOURCE_BYTES) {
-        return res.status(400).json({ error: "Source code exceeds 32 KB limit." });
-    }
-
     try {
+        if (req.method === "OPTIONS") {
+            return res.status(204).end();
+        }
+
+        if (req.method !== "POST") {
+            return res.status(405).json({ error: "Method not allowed." });
+        }
+
+        const body = req.body as { code?: unknown } | undefined;
+        const code = body?.code;
+
+        if (typeof code !== "string") {
+            return res.status(400).json({ error: "Missing or invalid `code` field (expected string)." });
+        }
+
+        if (Buffer.byteLength(code, "utf8") > MAX_SOURCE_BYTES) {
+            return res.status(400).json({ error: "Source code exceeds 32 KB limit." });
+        }
+
         const result = await runAdanCode(code);
         return res.status(200).json(result);
     } catch (e) {
-        console.error("[api/run] Error:", e);
+        console.error("[api/run] Unhandled error:", e);
         return res.status(503).json({ error: "Failed to execute code. The compiler may be temporarily unavailable." });
     }
 }
