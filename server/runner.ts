@@ -9,11 +9,8 @@ const SOURCE_FILE_PREFIX = join(tmpdir(), "adan-src-");
 const RUN_TIMEOUT_MS = 10_000;
 const MAX_OUTPUT_BYTES = 64 * 1024; // 64 KB output cap
 
-// Zig is bundled at build time (scripts/prepare-zig.sh) and included via
-// vercel.json `includeFiles`. Zig needs its lib/ directory alongside the
-// binary — we extract the full distribution to bin/zig-dist/.
-// In Lambda, process.cwd() is /var/task.
 const BUNDLED_ZIG = join(process.cwd(), "bin", "zig-dist", "zig");
+const BUNDLED_ZIG_LIB = join(process.cwd(), "bin", "zig-dist", "lib");
 const CLANG_WRAP_DIR = join(tmpdir(), "adan-clang-wrap");
 const CLANG_WRAP_PATH = join(CLANG_WRAP_DIR, "clang");
 
@@ -49,11 +46,10 @@ export function warmClang(): Promise<string> {
             }
             console.log("[runner] Using bundled zig at", BUNDLED_ZIG);
 
-            // Write a tiny `clang` shim that delegates to `zig cc`.
             mkdirSync(CLANG_WRAP_DIR, { recursive: true });
             writeFileSync(
                 CLANG_WRAP_PATH,
-                `#!/bin/sh\nexec "${BUNDLED_ZIG}" cc "$@"\n`,
+                `#!/bin/sh\nexec env ZIG_LIB_DIR="${BUNDLED_ZIG_LIB}" "${BUNDLED_ZIG}" cc "$@"\n`,
                 { mode: 0o755 },
             );
 
