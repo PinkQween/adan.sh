@@ -46,7 +46,7 @@ export async function runAdanCode(source: string): Promise<RunResult> {
     writeFileSync(sourceFile, source, "utf8");
 
     return new Promise((resolve) => {
-        const proc = spawn(binaryPath, [sourceFile]);
+        const proc = spawn(binaryPath, ["-f", sourceFile]);
 
         const stdoutChunks: Buffer[] = [];
         const stderrChunks: Buffer[] = [];
