@@ -22,7 +22,7 @@ html.adan-loading-active body > *:not(#adan-global-loader) {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgb(40, 40, 40);
+    background: #0d0d0d;
     z-index: 9999;
     opacity: 1;
     transition: opacity 220ms ease;
