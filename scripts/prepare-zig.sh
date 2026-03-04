@@ -4,7 +4,7 @@ set -euo pipefail
 ZIG_VERSION="0.13.0"
 ZIG_ARCH="zig-linux-x86_64-${ZIG_VERSION}"
 URL="https://ziglang.org/download/${ZIG_VERSION}/${ZIG_ARCH}.tar.xz"
-STAMP="v11-precached"
+STAMP="v12-precached"
 
 mkdir -p bin/zig-dist
 
@@ -34,6 +34,7 @@ find bin/zig-dist/lib -maxdepth 1 -mindepth 1 \
     ! -name 'include' \
     ! -name 'compiler_rt' \
     ! -name 'compiler_rt.zig' \
+    ! -name 'std' \
     -exec rm -rf {} +
 find bin/zig-dist/lib/libc -maxdepth 1 -mindepth 1 \
     ! -name 'include' \
@@ -51,6 +52,7 @@ find bin/zig-dist/lib/libc/glibc/sysdeps -maxdepth 1 -mindepth 1 -type d \
     ! -name 'x86' \
     ! -name 'generic' \
     ! -name 'unix' \
+    ! -name 'pthread' \
     -exec rm -rf {} +
 find bin/zig-dist/lib/libc/glibc/sysdeps/unix/sysv/linux -maxdepth 1 -mindepth 1 -type d \
     ! -name 'x86_64' \
@@ -73,6 +75,7 @@ rm -f /tmp/_adan_warmup.c /tmp/_adan_warmup
 rm -rf bin/zig-dist/lib/libc/glibc
 rm -rf bin/zig-dist/lib/compiler_rt
 rm -f bin/zig-dist/lib/compiler_rt.zig
+rm -rf bin/zig-dist/lib/std
 
 echo "$STAMP" > bin/zig-dist/.stamp
 echo "[prepare-zig] zig distribution ready at bin/zig-dist/ ($(du -sh bin/zig-dist | cut -f1))"
