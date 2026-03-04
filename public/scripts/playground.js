@@ -3,7 +3,7 @@
     // (no async data loading needed — the editor seeds from a constant)
     window.AdanPageReadyPromise = Promise.resolve();
 
-    const API_URL = window.ADAN_API_URL || "https://api.adan.sh";
+    const API_URL = window.ADAN_API_URL || "https://adan.sh/api";
 
     const SAMPLE_CODE = `import "adan/io";
 

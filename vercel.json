@@ -6,17 +6,17 @@
             "maxDuration": 30
         }
     },
-    "routes": [
+    "headers": [
         {
-            "src": "/(.*)",
-            "has": [
-                {
-                    "type": "host",
-                    "value": "api.adan.sh"
-                }
-            ],
-            "dest": "/api/$1"
-        },
+            "source": "/api/(.*)",
+            "headers": [
+                { "key": "Access-Control-Allow-Origin", "value": "https://playground.adan.sh" },
+                { "key": "Access-Control-Allow-Methods", "value": "POST, OPTIONS" },
+                { "key": "Access-Control-Allow-Headers", "value": "Content-Type" }
+            ]
+        }
+    ],
+    "routes": [
         {
             "src": "/",
             "has": [
