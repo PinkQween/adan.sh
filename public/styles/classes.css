@@ -436,6 +436,56 @@ code[class*="language-adan"] .token.boolean {
     color: #00e5ff !important;
 }
 
+/* ── Docs sidebar nav ───────────────────────────────────────────────────── */
+
+.docs-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 8px 0;
+}
+
+.docs-nav-group {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.docs-nav-title {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: rgb(110, 110, 110);
+    padding: 0 18px 6px;
+}
+
+.docs-nav-link {
+    display: block;
+    padding: 6px 18px;
+    font-size: 14px;
+    color: rgb(180, 180, 180);
+    border-radius: 0;
+    transition: color 0.15s, background 0.15s;
+    border-left: 2px solid transparent;
+    line-height: 1.4;
+}
+
+.docs-nav-link::after {
+    display: none !important;
+}
+
+.docs-nav-link:hover {
+    color: rgb(230, 230, 230);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.docs-nav-link.is-active {
+    color: rgb(245, 73, 73);
+    border-left-color: rgb(245, 73, 73);
+    background: rgba(200, 40, 40, 0.08);
+}
+
 .docs-layout {
     display: flex;
     align-items: flex-start;
