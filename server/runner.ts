@@ -49,7 +49,7 @@ export function warmClang(): Promise<string> {
             mkdirSync(CLANG_WRAP_DIR, { recursive: true });
             writeFileSync(
                 CLANG_WRAP_PATH,
-                `#!/bin/sh\nexec env ZIG_LIB_DIR="${BUNDLED_ZIG_LIB}" ZIG_GLOBAL_CACHE_DIR="/tmp/zig-global-cache" ZIG_LOCAL_CACHE_DIR="/tmp/zig-local-cache" "${BUNDLED_ZIG}" cc "$@"\n`,
+                `#!/bin/sh\nexec env ZIG_LIB_DIR="${BUNDLED_ZIG_LIB}" ZIG_GLOBAL_CACHE_DIR="/tmp/zig-global-cache" ZIG_LOCAL_CACHE_DIR="/tmp/zig-local-cache" "${BUNDLED_ZIG}" cc -march=x86-64 "$@"\n`,
                 { mode: 0o755 },
             );
 
