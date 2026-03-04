@@ -4,7 +4,7 @@ set -euo pipefail
 ZIG_VERSION="0.13.0"
 ZIG_ARCH="zig-linux-x86_64-${ZIG_VERSION}"
 URL="https://ziglang.org/download/${ZIG_VERSION}/${ZIG_ARCH}.tar.xz"
-STAMP="v5-stripped"
+STAMP="v6-stripped"
 
 mkdir -p bin/zig-dist
 
@@ -24,16 +24,10 @@ curl -fsSL "$URL" | tar xJ \
 
 chmod +x bin/zig-dist/zig
 
-rm -rf bin/zig-dist/lib/std
-rm -rf bin/zig-dist/lib/libcxx
-rm -rf bin/zig-dist/lib/libcxxabi
-rm -rf bin/zig-dist/lib/libc/mingw
-rm -rf bin/zig-dist/lib/libc/wasi
-rm -rf bin/zig-dist/lib/libc/musl
-rm -rf bin/zig-dist/lib/libunwind
-rm -rf bin/zig-dist/lib/libc/glibc
-rm -rf bin/zig-dist/lib/compiler_rt
-
+# Keep only the C headers needed for zig cc -target x86_64-linux-gnu.
+# Everything else in lib/ (std, libcxx, libcxxabi, compiler_rt, etc.) is unnecessary.
+find bin/zig-dist/lib -maxdepth 1 -mindepth 1 ! -name 'libc' -exec rm -rf {} +
+find bin/zig-dist/lib/libc -maxdepth 1 -mindepth 1 ! -name 'include' -exec rm -rf {} +
 find bin/zig-dist/lib/libc/include -maxdepth 1 -mindepth 1 -type d \
     ! -name 'x86_64*' \
     ! -name 'generic*' \
