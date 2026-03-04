@@ -1,4 +1,4 @@
-import { warmBinary, runAdanCode } from "./runner";
+import { warmBinary, warmClang, runAdanCode } from "./runner";
 
 const PORT = Number(process.env.PORT) || 3000;
 const MAX_SOURCE_BYTES = 32 * 1024; // 32 KB source cap
@@ -69,3 +69,4 @@ Bun.serve({
 console.log(`[server] Listening on http://localhost:${PORT}`);
 
 warmBinary().catch((e) => console.warn("[server] Binary pre-warm failed:", e));
+warmClang().catch((e) => console.warn("[server] Clang pre-warm failed:", e));

@@ -3,9 +3,18 @@
     "outputDirectory": "public",
     "functions": {
         "api/run.ts": {
-            "maxDuration": 30
+            "maxDuration": 60
+        },
+        "api/warm.ts": {
+            "maxDuration": 60
         }
     },
+    "crons": [
+        {
+            "path": "/api/warm",
+            "schedule": "*/5 * * * *"
+        }
+    ],
     "routes": [
         {
             "src": "/api/(.*)",
