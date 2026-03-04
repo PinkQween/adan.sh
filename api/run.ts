@@ -38,7 +38,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         const result = await runAdanCode(code);
         return res.status(200).json(result);
     } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
         console.error("[api/run] Unhandled error:", e);
-        return res.status(503).json({ error: "Failed to execute code. The compiler may be temporarily unavailable." });
+        return res.status(503).json({ error: `Execution failed: ${msg}` });
     }
 }
