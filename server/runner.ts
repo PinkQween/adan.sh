@@ -39,15 +39,13 @@ export interface RunResult {
     timedOut: boolean;
 }
 
-export async function runAdanCode(source: string): Promise<RunResult> {
-    const binaryPath = await warmBinary();
-
-    const sourceFile = `${SOURCE_FILE_PREFIX}${Date.now()}-${Math.random().toString(36).slice(2)}.adn`;
-    writeFileSync(sourceFile, source, "utf8");
-
+function spawnCollect(
+    cmd: string,
+    args: string[],
+    timeoutMs: number,
+): Promise<{ stdout: string; stderr: string; exitCode: number; timedOut: boolean }> {
     return new Promise((resolve) => {
-        const proc = spawn(binaryPath, ["-f", sourceFile]);
-
+        const proc = spawn(cmd, args);
         const stdoutChunks: Buffer[] = [];
         const stderrChunks: Buffer[] = [];
         let timedOut = false;
@@ -55,27 +53,23 @@ export async function runAdanCode(source: string): Promise<RunResult> {
         const timeoutHandle = setTimeout(() => {
             timedOut = true;
             try { proc.kill("SIGKILL"); } catch {}
-        }, RUN_TIMEOUT_MS);
+        }, timeoutMs);
 
         proc.stdout.on("data", (chunk: Buffer) => stdoutChunks.push(chunk));
         proc.stderr.on("data", (chunk: Buffer) => stderrChunks.push(chunk));
 
+        const decode = (chunks: Buffer[]) => {
+            const buf = Buffer.concat(chunks);
+            const text = buf.subarray(0, MAX_OUTPUT_BYTES).toString("utf8");
+            return buf.byteLength > MAX_OUTPUT_BYTES ? text + "\n[output truncated]" : text;
+        };
+
         proc.on("close", (exitCode) => {
             clearTimeout(timeoutHandle);
-            try { unlinkSync(sourceFile); } catch {}
-
-            const decode = (chunks: Buffer[]) => {
-                const buf = Buffer.concat(chunks);
-                const text = buf.subarray(0, MAX_OUTPUT_BYTES).toString("utf8");
-                return buf.byteLength > MAX_OUTPUT_BYTES
-                    ? text + "\n[output truncated]"
-                    : text;
-            };
-
             resolve({
                 stdout: decode(stdoutChunks),
                 stderr: timedOut
-                    ? `Execution timed out after ${RUN_TIMEOUT_MS / 1000}s.`
+                    ? `Process timed out after ${timeoutMs / 1000}s.`
                     : decode(stderrChunks),
                 exitCode: exitCode ?? (timedOut ? -1 : 0),
                 timedOut,
@@ -84,13 +78,46 @@ export async function runAdanCode(source: string): Promise<RunResult> {
 
         proc.on("error", (err) => {
             clearTimeout(timeoutHandle);
-            try { unlinkSync(sourceFile); } catch {}
-            resolve({
-                stdout: "",
-                stderr: `Failed to start compiler: ${err.message}`,
-                exitCode: -1,
-                timedOut: false,
-            });
+            resolve({ stdout: "", stderr: err.message, exitCode: -1, timedOut: false });
         });
     });
+}
+
+export async function runAdanCode(source: string): Promise<RunResult> {
+    const compilerPath = await warmBinary();
+    const id = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const sourceFile = `${SOURCE_FILE_PREFIX}${id}.adn`;
+    const outputBinary = join(tmpdir(), `adan-out-${id}`);
+
+    writeFileSync(sourceFile, source, "utf8");
+
+    try {
+        const compile = await spawnCollect(
+            compilerPath,
+            ["--file", sourceFile, "--link", "--bundle-libs", "libs/io", "-o", outputBinary],
+            RUN_TIMEOUT_MS,
+        );
+
+        if (compile.exitCode !== 0 || compile.timedOut) {
+            return {
+                stdout: compile.stdout,
+                stderr: compile.stderr || "Compilation failed.",
+                exitCode: compile.exitCode,
+                timedOut: compile.timedOut,
+            };
+        }
+
+        chmodSync(outputBinary, 0o755);
+        const run = await spawnCollect(outputBinary, [], RUN_TIMEOUT_MS);
+
+        return {
+            stdout: run.stdout,
+            stderr: run.stderr,
+            exitCode: run.exitCode,
+            timedOut: run.timedOut,
+        };
+    } finally {
+        try { unlinkSync(sourceFile); } catch {}
+        try { unlinkSync(outputBinary); } catch {}
+    }
 }
