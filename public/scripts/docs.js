@@ -41,7 +41,7 @@ document.addEventListener("DOMContentLoaded", () => {
         if (window.Prism) {
             if (!Prism.languages.adan) {
                 Prism.languages.adan = {
-                    "comment": /\/\/.*/,
+                    "comment": /\/\/.*|\/\*[\s\S]*?\*\//,
                     "string": {
                         pattern: /`(?:[^`\\]|\\.)*`|"(?:[^"\\]|\\.)*"|'(?:[^'\\]|\\.)*'/,
                         greedy: true,

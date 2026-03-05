@@ -16,6 +16,8 @@ Types like `i32` and `u32` differ because of the letter that comes before it. Wi
 | `u32` | 32 bits | 0 to 4,294,967,295 |
 | `i64` | 64 bits | -9,223,372,036,854,775,808 to 9,223,372,036,854,775,807 |
 | `u64` | 64 bits | 0 to 18,446,744,073,709,551,615 |
+| `f32` | 32 bits | ±1.4E-45 to ±3.4E38 |
+| `f64` | 64 bits | ±4.9E-324 to ±1.8E308 |
 
 ### Strings
 
