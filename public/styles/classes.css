@@ -589,4 +589,11 @@ code[class*="language-adan"] .token.boolean {
         width: 100%;
         position: static;
     }
+
+    .docs-main {
+        flex: 0 0 auto;
+        align-self: auto;
+        width: 100%;
+        box-sizing: border-box;
+    }
 }
