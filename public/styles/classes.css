@@ -578,6 +578,7 @@ code[class*="language-adan"] .token.boolean {
 }
 
 .docs-main {
+    max-width: 900px;
     flex: 1 1 0;
     min-width: 0;
     align-self: stretch;
