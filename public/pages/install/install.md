@@ -28,12 +28,18 @@ make
 ## Useful Make Commands
 
 ```bash
-make         # Clean, build, and run the binary
-make build   # Clean and create a fresh binary
-make run     # Clear terminal and run an existing binary
-make format  # Format C files in ./src using .clang-format
-make clean   # Remove existing binary in ./build
-make install # Install required dependencies (Linux only)
+$ make                     # Clean, build, and run the binary file.
+$ make build               # Clean and create a fresh binary.
+$ make emit                # Build and emit LLVM IR for the sample file.
+$ make link                # Build, compile, and link the sample file.
+$ make run                 # Clear the terminal, then run the sample binary.
+$ make format              # Beautifies all C and header files in ./src and ./libs, using .clang-format.
+$ make clean               # Removes all build artifacts and sample outputs.
+$ make install             # Install all required dependencies. (Linux required for now!)
+$ make build-macos-arm64   # Build the binary for macOS ARM64 (Apple Silicon).
+$ make build-macos-x86_64  # Build the binary for macOS x86_64 (Intel Macs).
+$ make build-macos         # Build both macOS binaries (ARM64 and x86_64).
+$ make push                # Run the push.sh script (for maintainers).
 ```
 
 
@@ -47,41 +53,19 @@ adanc -f <file.adn> [options]
 |------|-------------|
 | `-f, --file <file>` | Source file to compile (`.adn` or `.adan` extension required) |
 | `-o, --output <path>` | Output path for the linked binary. If `<path>` is a directory, the binary is placed inside it named after the source file |
-| `--link` | Link the compiled IR into an executable |
-| `--libs <libs>` | Comma-separated list of extra libraries to link against |
-| `--bundle-runtime` | Bundle the built-in runtime (`adan/io`) into the binary |
-| `--bundle-embedded <mods>` | Bundle specific embedded modules into the binary (comma-separated) |
-| `--bundle-libs <libs>` | Bundle external libraries into the binary |
+| `-r, --rawir` | Stop after emitting LLVM IR (.ll file) |
 | `-h, --help` | Show the help message and exit |
 
 ### Examples
 
-Compile a source file to LLVM IR:
+Compile a source file:
 
 ```bash
-adanc -f main.adn
+adan -f main.adn
 ```
 
-Compile and link into an executable:
+Compile and specify an output path:
 
 ```bash
-adanc -f main.adn --link
-```
-
-Compile, link, and specify an output path:
-
-```bash
-adanc -f main.adn --link -o ./build/myprogram
-```
-
-Link against external libraries:
-
-```bash
-adanc -f main.adn --link --libs mylib,otherlib
-```
-
-Bundle the runtime and link:
-
-```bash
-adanc -f main.adn --link --bundle-runtime
+adan -f main.adn -o ./build/myprogram
 ```
