@@ -1,1 +1,9 @@
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/00f0966a-84cf-477c-904f-646c9870e393" />
+<table>
+  <tbody>
+    <tr>
+      <td>
+        <img src="https://github.com/user-attachments/assets/96b3775f-5246-41e3-be0d-5f2dfc991876" alt="University Enrolment Data Table" width="1919" height="1080">
+      </td>
+    </tr>
+  </tbody>
+</table>
