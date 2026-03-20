@@ -3,13 +3,6 @@
     "outputDirectory": "public",
     "routes": [
         {
-            "src": "/.well-known/discord",
-            "dest": "/.well-known/discord",
-            "headers": {
-                "Content-Type": "text/plain"
-            }
-        },
-        {
             "src": "/",
             "has": [
                 {
