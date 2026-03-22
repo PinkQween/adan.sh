@@ -61,13 +61,13 @@ set m: i32 = 5 ^ 2;  // 25
 Operators follow standard mathematical precedence. Exponentiation binds most tightly, followed by multiplication, division, and modulo, then addition and subtraction (PEMDAS).
 
 ```adan
-set g: i32 = 2 + 3 * 4; // 14  (multiplication before addition)
+set g: i32 = 2 + 3 * 4; // 14 (Multiplication before addition)
 ```
 
 Use parentheses to override the default order of evaluation.
 
 ```adan
-set h: i32 = (2 + 3) * 4; // 20  (addition first due to parentheses)
+set h: i32 = (2 + 3) * 4; // 20 (Addition first due to parentheses)
 ```
 
 ### Full Example
@@ -91,19 +91,19 @@ fun main(): i32
     set l: i32 = 3 ^ 4;
     set m: i32 = 5 ^ 2;
 
-    println("10 + 5 = 15");
-    println("20 - 8 = 12");
-    println("6 * 7 = 42");
-    println("100 / 4 = 25");
-    println("17 % 5 = 2");
-    println("2 ^ 8 = 256");
-    println("2 + 3 * 4 = 14");
-    println("(2 + 3) * 4 = 20");
-    println("10 + 5 * 2 - 8 / 4 = 18");
-    println("(10 + 5) * (20 - 8) / 3 = 60");
-    println("100 / 10 / 2 = 5");
-    println("3 ^ 4 = 81");
-    println("5 ^ 2 = 25");
+    println(`10 + 5 = ${a}`); // 15
+    println(`20 - 8 = ${b}`); // 12
+    println(`6 * 7 = ${c}`); // 42
+    println(`100 / 4 = ${d}`); // 25
+    println(`17 % 5 = ${e}`); // 2
+    println(`2 ^ 8 = ${f}`); // 256
+    println(`2 + 3 * 4 = ${g}`); // 14
+    println(`(2 + 3) * 4 = ${h}`); // 20
+    println(`10 + 5 * 2 - 8 / 4 = ${i}`); // 18
+    println(`(10 + 5) * (20 - 8) / 3 = ${j}`); // 60
+    println(`100 / 10 / 2 = ${k}`); // 5
+    println(`3 ^ 4 = ${l}`); // 81
+    println(`5 ^ 2 = ${m}`); // 25
 
     return 0;
 }

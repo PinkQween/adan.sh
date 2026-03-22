@@ -38,3 +38,12 @@ fun myFun(): void {
     return; // Anything else isn't allowed.
 }
 ```
+
+### Type Casting
+
+ADAN supports explicit type casting, allowing you to convert values from one type to another using the `(<type>)<expression>` syntax. This is particularly useful for parsing strings into numbers.
+
+```adan
+set strNumber: string = "42";
+set num: i32 = (i32)strNumber;
+```

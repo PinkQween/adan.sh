@@ -46,7 +46,7 @@ fun multiply(x: f64, y: f64): f64 {
 }
 
 fun printScore(score: i32): void {
-    return; // void functions must still use return to exit.
+    return; // Void functions must still use return to exit.
 }
 ```
 
